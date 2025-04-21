@@ -23,15 +23,29 @@ def train_one_epoch(loader, model, optimizer, criterion, device):
         batch_size = inputs.shape[0]
         inputs = inputs.to(device)
 
-        y_pred = model(inputs)
-        y_pred = y_pred.permute(1, 0, 2)
+        y_pred = model(inputs)  # [batch, time, classes]
+        y_pred = y_pred.permute(1, 0, 2)  # [time, batch, classes]
 
-        input_lengths = torch.IntTensor(batch_size).fill_(37)
-        target_lengths = torch.IntTensor([len(t) for t in labels])
+        # Compute lengths
+        input_lengths = torch.full(size=(batch_size,), fill_value=y_pred.size(0), dtype=torch.int32)
 
-        loss = criterion(y_pred.cpu(), labels,
-                         input_lengths, target_lengths)
-        total_loss += loss.detach().numpy()
+        # Assume labels is a 2D tensor: [batch_size, max_target_length]
+        # Remove padding (0) and flatten targets
+        targets = []
+        target_lengths = []
+
+        for label_seq in labels:
+            non_zeros = label_seq[label_seq != 0]  # assuming 0 is your padding and blank token
+            targets.append(non_zeros)
+            target_lengths.append(len(non_zeros))
+
+        targets = torch.cat(targets).to(torch.int32)
+        target_lengths = torch.tensor(target_lengths, dtype=torch.int32)
+
+        # Compute loss
+        loss = criterion(y_pred.cpu(), targets, input_lengths, target_lengths)
+        print("Loss:", loss.item())
+        total_loss += loss.item()
 
         _, max_index = torch.max(y_pred.cpu(), dim=2)
 
@@ -90,3 +104,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

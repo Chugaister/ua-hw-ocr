@@ -30,7 +30,7 @@ def encode(string):
     return pad_token
 
 
-def decode(token, vocabulary):
+def decode(token):
     int2char, _ = get_vocabulary()
     token = token[token != 0]
     string = [int2char[i.item()] for i in token]
