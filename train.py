@@ -87,7 +87,7 @@ def main():
         test_dataset, batch_size=config.BATCH_SIZE, shuffle=False, pin_memory=True)
 
     input_size = 64
-    hidden_size = 128
+    hidden_size = 256
     output_size = config.VOCAB_SIZE + 1
     num_layers = 2
 
