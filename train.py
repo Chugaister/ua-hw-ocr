@@ -44,7 +44,7 @@ def train_one_epoch(loader, model, optimizer, criterion, device):
 
         # Compute loss
         loss = criterion(y_pred.cpu(), targets, input_lengths, target_lengths)
-        print("Loss:", loss.item())
+        print("\nLoss:", loss.item())
         total_loss += loss.item()
 
         _, max_index = torch.max(y_pred.cpu(), dim=2)
@@ -56,7 +56,6 @@ def train_one_epoch(loader, model, optimizer, criterion, device):
                 [c for c, _ in groupby(raw_prediction) if c != 0])
             real = torch.IntTensor(
                 [c for c, _ in groupby(labels[i]) if c != 0])
-
             if len(prediction) == len(real) and torch.all(prediction.eq(real)):
                 correct += 1
             total += 1
@@ -67,7 +66,7 @@ def train_one_epoch(loader, model, optimizer, criterion, device):
 
     ratio = correct / total
     print('TEST correct: ', correct, '/', total, ' P:', ratio)
-    print("Avg CTC loss:", total_loss/batch_idx)
+    print("Avg CTC loss:", total_loss/(batch_idx+1))
 
 
 def main():
@@ -75,7 +74,7 @@ def main():
     valid_data = utils.get_dataset(config.VALID_CSV)
     test_data = utils.get_dataset(config.TEST_CSV)
 
-    train_dataset = HRDataset(train_data, utils.encode, mode='train')
+    train_dataset = HRDataset(train_data[:16], utils.encode, mode='train')
     valid_dataset = HRDataset(valid_data, utils.encode, mode='valid')
     test_dataset = HRDataset(test_data, utils.encode, mode='test')
 
@@ -87,7 +86,7 @@ def main():
         test_dataset, batch_size=config.BATCH_SIZE, shuffle=False, pin_memory=True)
 
     input_size = 64
-    hidden_size = 256
+    hidden_size = 128
     output_size = config.VOCAB_SIZE + 1
     num_layers = 2
 

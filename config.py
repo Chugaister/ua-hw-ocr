@@ -1,7 +1,7 @@
 import torch
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-BATCH_SIZE = 128
+BATCH_SIZE = 16
 NUM_EPOCHS = 50
 LEARNING_RATE = 1e-5
 TRAIN_IMAGES_DIR = 'dataset/'

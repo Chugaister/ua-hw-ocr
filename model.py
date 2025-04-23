@@ -28,8 +28,7 @@ class FeatureExtractor(nn.Module):
         outputs = outputs.permute(0, 2, 3, 1)
         outputs = outputs.reshape(
             outputs.shape[0], -1, outputs.shape[2]*outputs.shape[3])
-        outputs = torch.stack([self.relu(self.fc(outputs[i]))
-                               for i in range(outputs.shape[0])])
+        outputs = self.relu(self.fc(outputs))
         outputs = self.dropout(outputs)
         return outputs
 
@@ -51,8 +50,7 @@ class BiLSTM(nn.Module):
                          self.hidden_size).to(config.DEVICE)
 
         outputs, _ = self.lstm(labels, (h0, c0))
-        outputs = torch.stack([self.fc(outputs[i])
-                               for i in range(outputs.shape[0])])
+        outputs = self.fc(outputs)
         outputs = self.softmax(outputs)
         return outputs
 
